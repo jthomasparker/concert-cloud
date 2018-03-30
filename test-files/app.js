@@ -42,11 +42,21 @@ $(document).ready(function(){
      for(i = 0; i < results.length; i++){
          for(j = 0; j < results[i].performers.length; j++){
              var performer = results[i].performers[j].name
+             var performers = [];
+             performers.push(performer)
          }
+         console.log(performers)
         var title = results[i].title;
         var date = results[i].datetime_local;
-         var concert = $('<div>').html(date + " " + title + " " + performer)
-         $('#results').append(concert)
+        var performers = results[i].performers
+        var resultDiv = $('<div>').html(date)
+         var resultPanel = $('<div class="panel panel-default">')
+         var panelHeading = $('<div class="panel-heading">').text(title).appendTo(resultPanel)
+         var panelBody = $('<div class="panel-body">').append(resultDiv)
+      
+         panelBody.appendTo(resultPanel)
+         
+         $('#results').append(resultPanel)
      }
  }) 
 
