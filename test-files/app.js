@@ -67,7 +67,7 @@ function querySeatGeek(){
         for(i = 0; i < results.length; i++){
             
             // create the main panel for results
-            var resultPanel = $('<div class="panel panel-default">')
+            var resultPanel = $('<div class="panel panel-default resultPanel">')
             var panelHeading = $('<div class="panel-heading">').appendTo(resultPanel);
             var panelTitle = $('<h1 class="panel-title">').appendTo(panelHeading);
             var panelBody = $('<div class="panel-body">').appendTo(resultPanel);
