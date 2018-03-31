@@ -151,7 +151,10 @@ function querySeatGeek(){
             // append it all to the results div that's hard-coded in
             $('#results').append(resultPanel);
         }
+
+
     }) 
+    
 }
 
 
@@ -217,7 +220,6 @@ function queryWeather(whenDiv, cityAndState, date){
     }
       });
 }
-
 
 
 
