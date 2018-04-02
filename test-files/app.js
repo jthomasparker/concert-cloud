@@ -2,14 +2,19 @@
 
 var eventBriteToken = 'H3LGM754AS3WAX5USJYR'
 var googleApiKey = 'AIzaSyAoSUvf9nkYuSYOhZbwtCjt1THHC9V0KGo'
-var seatGeekid = 'MTEwMzkzNDZ8MTUyMjM2NDA5NS41Mw'
-var seatGeekkey = '094349186bab82b92cda01baee0176b6a15cb2703a3b630c1108bc73ba7a66d3'
+var sgId = 'MTEwMzkzNDZ8MTUyMjM2NDA5NS41Mw'
+var sgKey = '094349186bab82b92cda01baee0176b6a15cb2703a3b630c1108bc73ba7a66d3'
 var qYoutube;
 var qEventBrite;
-var qSeatGeek = "concert"
+var eventType = "concert"
 var googleUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q=' + qYoutube + '&type=video&videoEmbeddable=true&key=' + googleApiKey
 var eventBriteurl = 'https://www.eventbriteapi.com/v3/events/search/?token=H3LGM754AS3WAX5USJYR&q=' + qEventBrite
-
+var sgQ = "";
+var page = 1;
+var sgPerformer = "";
+var favorites = [];
+var displayFavorites = false;
+var favoriteCount;
 
 
 $(document).ready(function(){
@@ -28,15 +33,16 @@ $(document).ready(function(){
             $('#results').append(title)
         }
     }) */
+     favoriteCount = favorites.length;
 
     // click event for performer button - loads youtube video
     $('body').on('click', '.performerBtn', function(){
         // get the text of the button (performer name used for youtube search)
         var performer = $(this).text();
-        // get the id of the div containing the button
-        var performerDivId = $(this).closest('div').attr('id');
-        // use the container id to select where the video should display
-        var videoDiv = $('#v' + performerDivId);
+        // get the event-id
+        var eventId = $(this).attr('event-id')
+        // use the event-id attr to select the videoDiv 
+        var videoDiv = $('.video-output[event-id=' + eventId + ']')
         // set the youtube search to performer plus music
         qYoutube = performer + " music"
         // call youtube api with the div of where to display the video
@@ -44,18 +50,84 @@ $(document).ready(function(){
         
     })
 
+    $('#btnSearch').on('click', function(){
+        if(!displayFavorites){
+      var  searchInput = $('#search')
+      // sgPerformer = searchInput.val();
+        sgQ = searchInput.val();
+     //  $('#results').empty();
+        querySeatGeek();
+     //   searchInput.val('')
+      //  resetVariables();
+        }
+    })
 
-    querySeatGeek();
+    $('#navFavorites').on('click', function(){
+        displayFavorites = true;
+        $('#navFavorites').addClass("active")
+        $('#navHome').removeClass("active")
+        $('#results').empty();
+        if(favorites.length > 0){
+            querySeatGeek();
+        }
+    })
+
+    $('#navHome').on('click', function(){
+        displayFavorites = false;
+        $('#navFavorites').removeClass("active")
+        $('#navHome').addClass("active")
+        querySeatGeek();
+    })
+
+    $('body').on('click', '.btnFavorite', function(){
+        var thisBtn = $(this)
+        var eventId = $(this).attr("event-id")
+        if(favorites.indexOf(eventId) < 0){
+            favorites.push(eventId)
+        } else {
+            var idx = favorites.indexOf(eventId)
+            favorites.splice(idx, 1)
+        }
+        if(displayFavorites){
+            if(favorites.length > 0){
+                querySeatGeek();
+            } else {
+            $('#results').empty();
+            }
+        }
+        updateFavoriteBtn(thisBtn)
+        
+    })
+
  
 })
 
 
+function resetVariables(){
+    sgQ = "";
+    page = 1;
+    sgPerformer = ""
+
+}
+
 // searches seatgeek api
 function querySeatGeek(){
-    var seatGeekurl = 'https://api.seatgeek.com/2/events?taxonomies.name=' + qSeatGeek + '&client_id=' + seatGeekid + '&client_secret=' + seatGeekkey
+    $('#results').empty();
+    var url = 'https://api.seatgeek.com/2/events?taxonomies.name=' + eventType;
+    url += '&' + $.param({
+    'per_page': 10,
+    'page': page,
+    'q': sgQ,
+    'client_id': sgId,
+    'client_secret': sgKey,
+    'performers.slug': sgPerformer,
+    'id': favorites
+    });
+    console.log(url)
+
     $.ajax({
         method: 'GET',
-        url: seatGeekurl,
+        url: url,
         async: true,
         crossDomain: true,
         headers: {}
@@ -69,15 +141,18 @@ function querySeatGeek(){
             // create the main panel for results
             var resultPanel = $('<div class="panel panel-default resultPanel">')
             var panelHeading = $('<div class="panel-heading">').appendTo(resultPanel);
-            var panelTitle = $('<h1 class="panel-title">').appendTo(panelHeading);
+            // favorite button
+            var btnFavorite = $('<button class="btnFavorite">').appendTo(panelHeading)
+            var panelTitle = $('<h1>').appendTo(panelHeading);
+            
             var panelBody = $('<div class="panel-body">').appendTo(resultPanel);
 
             // create the sub row to divide main panel
             var row = $('<div class="row">').appendTo(panelBody);
             // columns of main panel - size can be adjusted just by changing the bootstrap classes
-            var leftCol = $('<div class="col-xs-12 col-md-4">').appendTo(row);
-            var middleCol = $('<div class="col-xs-12 col-md-4">').appendTo(row);
-            var rightCol = $('<div class="col-xs-12 col-md-4">').appendTo(row);
+            var leftCol = $('<div class="col-xs-12 col-md-6">').appendTo(row);
+            var middleCol = $('<div class="col-xs-12 col-md-6">').appendTo(row);
+            var rightCol = $('<div class="col-xs-0">').appendTo(row);
 
             // create the sub-panels
             // venuePanel contains venue info
@@ -97,7 +172,9 @@ function querySeatGeek(){
             // div for event date and forecast
             var whenDiv = $('<div>').html("<h3>When:</h3>");
             // div for youtube video display
-            var videoDiv = $('<div>');
+            var videoDiv = $('<div class="video-output">');
+            
+                            
 
             
 
@@ -115,38 +192,49 @@ function querySeatGeek(){
             var eventUrl = results[i].url;
             var eventScore = results[i].score;
             var venueName = '<h4>' + results[i].venue.name + '</h4>';
-            var venueAddress = results[i].venue.address + '<br>';
-            var venueCity = results[i].venue.city  + ', ';
+            var venueStreet = results[i].venue.address;
+            var venueCity = results[i].venue.city;
             var venueState = results[i].venue.state;
-            var venueCityandState = venueCity + "," + venueState;
-            var venueZip = '<br>' + results[i].venue.postalcode;
+            var venueCityandState = venueCity + ", " + venueState;
+            var venueZip = results[i].venue.postal_code;
             var venueLocation = results[i].venue.location;
             var title = results[i].title;
             var date = moment(results[i].datetime_local).format("MM/DD/YYYY");
-            var dateTime = moment(results[i].datetime_local).format("dddd, MMMM Do YYYY, [at] h:mm a");
+            var dateTime = moment(results[i].datetime_local) //.format("MM-DD-YYYY HH:mm")
+            
+            var formattedDateTime = moment(results[i].datetime_local).format("dddd, MMMM Do YYYY, [at] h:mm a")
+            var formattedAddress = venueStreet + "<br>" + venueCityandState + "<br>" + venueZip
+            
+            
 
             // Set the title of the result panel
-            panelTitle.html(date + " - " + title);
+            panelTitle.html(date + " - " + title) //.append(btnFavorite) panelHeading.append(
             // append the formatted date/time to whenDiv
-            whenDiv.append(dateTime);
-            
+            whenDiv.append(formattedDateTime)
+            // set the event-id for the button
+            performerBtn.attr("event-id", eventId)
             //TODO: get venue rating from yelp?
             // append all the venue stuff plus the whenDiv to the venue panel
-            venueDiv.append(venueName, venueAddress, venueCity, venueState, venueZip, whenDiv);
+            venueDiv.append(venueName, formattedAddress, whenDiv);
             // append the videoDiv to the performersDiv (output video will display below performers)
             performersDiv.append(videoDiv);
             
             // assign ids to divs for later use
-            resultPanel.attr('id', 'e' + eventId);
-            performersDiv.attr('id', 'p' + eventId);
-            rightCol.attr('id', 'rightColp' + eventId);
-            whenDiv.attr('id', 'when' + eventId);
-            videoDiv.attr('id', 'vp' + eventId);
+            resultPanel.attr('event-id', eventId);
+            performersDiv.attr('event-id', eventId);
+            whenDiv.attr('event-id', eventId);
+            videoDiv.attr('event-id', eventId);
+            btnFavorite.attr({'id': 'b' + eventId,
+                            'event-id': eventId})
+                           
+
+            updateFavoriteBtn(btnFavorite)
+            
 
             // get the weather if the event date is within the next 5 days
-            var fiveDaysAway = moment().add(5, 'd').format("MM/DD/YYYY");
-            if(fiveDaysAway > date){
-                queryWeather(whenDiv, venueCityandState, date);
+            var fiveDaysAway = moment().add(5, 'd') //.format("MM-DD-YYYY HH:mm");
+            if(moment(dateTime).isBetween(moment(), fiveDaysAway)){
+                queryWeather(whenDiv, venueZip, dateTime);
             }
             // append it all to the results div that's hard-coded in
             $('#results').append(resultPanel);
@@ -190,11 +278,11 @@ function queryYoutube(videoDiv){
 }
 
 
-function queryWeather(whenDiv, cityAndState, date){
-    var weatherUrl = "https://api.openweathermap.org/data/2.5/forecast?q=" + cityAndState + ",usa&units=imperial&APPID=cf2aa58036825fe3fb68e07d959d4291";
-
+function queryWeather(whenDiv, venueZip, dateTime){
+  //  var weatherUrl = "https://api.openweathermap.org/data/2.5/forecast?q=" + cityAndState + ",us&units=imperial&APPID=cf2aa58036825fe3fb68e07d959d4291";
+    var url = "https://api.openweathermap.org/data/2.5/forecast?zip=" + venueZip + "&units=imperial&APPID=cf2aa58036825fe3fb68e07d959d4291";
     $.ajax({
-        url: weatherUrl,
+        url: url,
         method: "GET",
         async: true,
       crossDomain: true,
@@ -203,23 +291,47 @@ function queryWeather(whenDiv, cityAndState, date){
         var results = response.list
         console.log(response)
         for(var i = 0; i < results.length; i++){
-      var forecastDate = moment(results[i].dt_txt).format("MM/DD/YYYY")
-      
-      //  console.log(forecastDate)
-        
-        if(forecastDate == date){
-            console.log(forecastDate, date)
-            var lowTemp = results[i].main.temp_min
-            var highTemp = results[i].main.temp_max
+
+      var forecastStartTime = moment(results[i].dt_txt) 
+      if(i + 1 < results.length){
+      var forecastEndTime = moment(results[i + 1].dt_txt) 
+      } else {
+          var forecastEndtime = moment(results[i].dt_txt)
+      }
+     
+      console.log(i, venueZip, forecastStartTime, forecastEndTime, dateTime)
+        if((moment(dateTime).isBetween(forecastStartTime, forecastEndTime, 'minute', [])) || (moment(dateTime).isSame(forecastStartTime, forecastEndTime, 'minute'))) {
+            var lowTemp = Math.round(results[i].main.temp_min)
+            var highTemp = Math.round(results[i].main.temp_max)
             var humidity = results[i].main.humidity
             var rain = results[i].rain
             var forecast = results[i].weather[0].description
-            var weather = $("<div>").html('<h4>Forecast</h4>' + 'Temp: ' + lowTemp + ' - ' + highTemp + '<br>' + forecast)
+            var weather = $("<div>").html('<h4>Forecast</h4>' + 'Temp: ' + lowTemp + ' - ' + highTemp + '&#176 (F)<br>' + forecast)
             whenDiv.append(weather)
         }
     }
       });
 }
+
+
+function updateFavoriteBtn(thisBtn){
+    
+    thisBtn.empty();
+    var eventId = $(thisBtn).attr("event-id")
+    var favStar = $('<span class="glyphicon">')
+   console.log(thisBtn.attr("event-id"))
+    // if it's not in favorites[], empty star otherwise filled star
+    if(favorites.indexOf(eventId) < 0){
+      //  $(thisBtn).attr("btnState", "inactive")
+        favStar.removeClass("glyphicon-star").addClass("glyphicon-star-empty")
+       
+    } else {
+     //   $(thisBtn).attr("btnState", "active")
+        favStar.removeClass("glyphicon-star-empty").addClass("glyphicon-star")  
+    }
+        $(thisBtn).append(favStar)
+}
+
 
 
 
