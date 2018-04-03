@@ -12,9 +12,25 @@ var eventBriteurl = 'https://www.eventbriteapi.com/v3/events/search/?token=H3LGM
 var sgQ = "";
 var page = 1;
 var sgPerformer = "";
+var localFavorites = [];
+var dbFavorites = [];
 var favorites = [];
 var displayFavorites = false;
 var favoriteCount;
+var config = {
+    apiKey: "AIzaSyC7rTCfLMZJrv9vy53vXZhJenvje0qwRQU",
+    authDomain: "concert-cloud.firebaseapp.com",
+    databaseURL: "https://concert-cloud.firebaseio.com",
+    projectId: "concert-cloud",
+    storageBucket: "concert-cloud.appspot.com",
+    messagingSenderId: "36077992367"
+  };
+  firebase.initializeApp(config);
+var db = firebase.database()
+var ref = db.ref("/users/")
+var currentUser;
+var signedIn = false;
+var signinRefused = false;
 
 
 $(document).ready(function(){
@@ -55,7 +71,6 @@ $(document).ready(function(){
       var  searchInput = $('#search')
       // sgPerformer = searchInput.val();
         sgQ = searchInput.val();
-     //  $('#results').empty();
         querySeatGeek();
      //   searchInput.val('')
       //  resetVariables();
@@ -64,6 +79,11 @@ $(document).ready(function(){
 
     $('#navFavorites').on('click', function(){
         displayFavorites = true;
+        /* this will be replaced by checkUser()
+        if(!signedIn){
+            $('#myModal').modal();
+             } */
+        checkUser()
         $('#navFavorites').addClass("active")
         $('#navHome').removeClass("active")
         $('#results').empty();
@@ -76,12 +96,21 @@ $(document).ready(function(){
         displayFavorites = false;
         $('#navFavorites').removeClass("active")
         $('#navHome').addClass("active")
+        if(sgQ.length === 0){
+            $('#results').empty;
+        } else{
         querySeatGeek();
+        }
     })
 
     $('body').on('click', '.btnFavorite', function(){
         var thisBtn = $(this)
         var eventId = $(this).attr("event-id")
+        /* this will be replaced by checkUser();
+        if(!signedIn){
+            $('#myModal').modal();
+        } */
+         checkUser();
         if(favorites.indexOf(eventId) < 0){
             favorites.push(eventId)
         } else {
@@ -95,10 +124,12 @@ $(document).ready(function(){
             $('#results').empty();
             }
         }
-        updateFavoriteBtn(thisBtn)
-        
+        updateFavoriteBtn(thisBtn)  
     })
 
+    $('#cancel').on('click', function(){
+        signinRefused = true;
+    })
  
 })
 
@@ -231,12 +262,12 @@ function querySeatGeek(){
             updateFavoriteBtn(btnFavorite)
             
 
-            // get the weather if the event date is within the next 5 days
+            // get the weather if the event date is within the next 5 days (the openweather api limit)
             var fiveDaysAway = moment().add(5, 'd') //.format("MM-DD-YYYY HH:mm");
             if(moment(dateTime).isBetween(moment(), fiveDaysAway)){
                 queryWeather(whenDiv, venueZip, dateTime);
             }
-            // append it all to the results div that's hard-coded in
+            // append it all to the results div
             $('#results').append(resultPanel);
         }
 
@@ -292,11 +323,12 @@ function queryWeather(whenDiv, venueZip, dateTime){
         console.log(response)
         for(var i = 0; i < results.length; i++){
 
-      var forecastStartTime = moment(results[i].dt_txt) 
+      var forecastStartTime = moment(results[i].dt_txt)
+      var forecastEndTime;
       if(i + 1 < results.length){
-      var forecastEndTime = moment(results[i + 1].dt_txt) 
+        forecastEndTime = moment(results[i + 1].dt_txt) 
       } else {
-          var forecastEndtime = moment(results[i].dt_txt)
+        forecastEndTime = moment(results[i].dt_txt)
       }
      
       console.log(i, venueZip, forecastStartTime, forecastEndTime, dateTime)
@@ -333,7 +365,51 @@ function updateFavoriteBtn(thisBtn){
 }
 
 
+function checkUser(){
+    firebase.auth().onAuthStateChanged(function(user) {
+        currentUser = user.uid;
+       if(user){
+           signedIn = true;
+         console.log(user.displayName + " is signed in as " + currentUser)
+         db.ref(currentUser).once("value", function(snapshot){
+       var snapshotval = snapshot.val();
+         dbFavorites = snapshotval.favorites;
+      //   favorites = combineArrays(localFavorites.concat(dbFavorites))
+      favorites = combineArrays(favorites.concat(dbFavorites))
+       console.log("snapshot data ", snapshotval, dbFavorites, currentUser)
+       $('#signin').empty();
+   })
+     } else {
+         console.log("not signed in")
+         signedIn = false;
+        if(!signinRefused){
+         $('#myModal').modal();
+        } else {
+            addSignInButton();
+        }
+     }
+   });
+}
 
+
+function combineArrays(array){
+    var arr = array.concat();
+    for(var i = 0; i < arr.length; i++){
+        for (var j = i+1; j < arr.length; j++){
+            if(arr[i] === arr[j]){
+                arr.splice(j--, 1)
+            }
+        }
+    }
+    return arr
+}
+
+
+function addSignInButton(){
+    var signinBtn = $('<button class="btn btn-default">')
+    $('#signin').append(signinBtn)
+
+}
 
 
 
