@@ -369,9 +369,10 @@ function checkUser(){
     firebase.auth().onAuthStateChanged(function(user) {
         currentUser = user.uid;
        if(user){
+        
            signedIn = true;
          console.log(user.displayName + " is signed in as " + currentUser)
-         db.ref(currentUser).once("value", function(snapshot){
+         db.ref("/users/" + currentUser).once("value", function(snapshot){
        var snapshotval = snapshot.val();
          dbFavorites = snapshotval.favorites;
       //   favorites = combineArrays(localFavorites.concat(dbFavorites))
