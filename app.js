@@ -7,34 +7,16 @@ var sgKey = '094349186bab82b92cda01baee0176b6a15cb2703a3b630c1108bc73ba7a66d3'
 var qYoutube;
 var qEventBrite;
 var eventType = "concert"
-var googleUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q=' + qYoutube + '&type=video&videoEmbeddable=true&key=' + googleApiKey
-var eventBriteurl = 'https://www.eventbriteapi.com/v3/events/search/?token=H3LGM754AS3WAX5USJYR&q=' + qEventBrite
 var sgQ = "";
 var page = 1;
-var sgPerformer = "";
-var localFavorites = [];
-var dbFavorites = []; 
+var sgPerformer = ""; 
 var favorites = [];
 var displayFavorites = false;
-var favoriteCount;
-var config = {
-    apiKey: "AIzaSyC35dcKZI6Ud3VBCsYCRh0U9ITTqCnOTRo",
-    authDomain: "signin-test-c48e1.firebaseapp.com",
-    databaseURL: "https://signin-test-c48e1.firebaseio.com",
-    projectId: "signin-test-c48e1",
-    storageBucket: "signin-test-c48e1.appspot.com",
-    messagingSenderId: "792725143174"
-  };
-  firebase.initializeApp(config);
-var db = firebase.database()
-var ref = db.ref("/users/")
-var currentUser;
-var signedIn = false;
-var signinRefused = false;
+
 
 
 $(document).ready(function(){
-    
+ 
 /* EVENTBRITE
     $.ajax({
         method: 'GET',
@@ -67,6 +49,7 @@ $(document).ready(function(){
     })
 
     $('#btnSearch').on('click', function(){
+        
         if(!displayFavorites){
       var  searchInput = $('#search')
       // sgPerformer = searchInput.val();
@@ -79,11 +62,7 @@ $(document).ready(function(){
 
     $('#navFavorites').on('click', function(){
         displayFavorites = true;
-        /* this will be replaced by checkUser()
-        if(!signedIn){
-            $('#myModal').modal();
-             } */
-        checkUser()
+    
         $('#navFavorites').addClass("active")
         $('#navHome').removeClass("active")
         $('#results').empty();
@@ -106,11 +85,7 @@ $(document).ready(function(){
     $('body').on('click', '.btnFavorite', function(){
         var thisBtn = $(this)
         var eventId = $(this).attr("event-id")
-        /* this will be replaced by checkUser();
-        if(!signedIn){
-            $('#myModal').modal();
-        } */
-         checkUser();
+     
         if(favorites.indexOf(eventId) < 0){
             favorites.push(eventId)
         } else {
@@ -126,20 +101,11 @@ $(document).ready(function(){
         }
         updateFavoriteBtn(thisBtn)  
     })
-
-    $('#cancel').on('click', function(){
-        signinRefused = true;
-    })
  
 })
 
 
-function resetVariables(){
-    sgQ = "";
-    page = 1;
-    sgPerformer = ""
 
-}
 
 // searches seatgeek api
 function querySeatGeek(){
@@ -365,52 +331,6 @@ function updateFavoriteBtn(thisBtn){
 }
 
 
-function checkUser(){
-    firebase.auth().onAuthStateChanged(function(user) {
-        currentUser = user.uid;
-       if(user){
-        
-           signedIn = true;
-         console.log(user.displayName + " is signed in as " + currentUser)
-         db.ref("/users/" + currentUser).once("value", function(snapshot){
-       var snapshotval = snapshot.val();
-         dbFavorites = snapshotval.favorites;
-      //   favorites = combineArrays(localFavorites.concat(dbFavorites))
-      favorites = combineArrays(favorites.concat(dbFavorites))
-       console.log("snapshot data ", snapshotval, dbFavorites, currentUser)
-       $('#signin').empty();
-   })
-     } else {
-         console.log("not signed in")
-         signedIn = false;
-        if(!signinRefused){
-         $('#myModal').modal();
-        } else {
-            addSignInButton();
-        }
-     }
-   });
-}
-
-
-function combineArrays(array){
-    var arr = array.concat();
-    for(var i = 0; i < arr.length; i++){
-        for (var j = i+1; j < arr.length; j++){
-            if(arr[i] === arr[j]){
-                arr.splice(j--, 1)
-            }
-        }
-    }
-    return arr
-}
-
-
-function addSignInButton(){
-    var signinBtn = $('<button class="btn btn-default">')
-    $('#signin').append(signinBtn)
-
-}
 
 
 
