@@ -10,28 +10,14 @@ var eventType = "concert"
 var sgQ = "";
 var page = 1;
 var sgPerformer = ""; 
+var lat = "";
+var lon = "";
 var favorites = [];
 var displayFavorites = false;
 
 
 
 $(document).ready(function(){
- 
-/* EVENTBRITE
-    $.ajax({
-        method: 'GET',
-        url: eventBriteurl,
-        async: true,
-        crossDomain: true,
-        headers: {}
-    }).done(function(response){
-        var results = response.events
-        console.log(results)
-        for(i=0; i < results.length; i++){
-            var title = results[i].name.html + '<p>'
-            $('#results').append(title)
-        }
-    }) */
 
     // click event for performer button - loads youtube video
     $('body').on('click', '.performerBtn', function(){
@@ -42,7 +28,7 @@ $(document).ready(function(){
         // use the event-id attr to select the videoDiv 
         var videoDiv = $('.video-output[event-id=' + eventId + ']')
         // set the youtube search to performer plus music
-        qYoutube = performer + " music"
+        qYoutube = performer + " official"
         // call youtube api with the div of where to display the video
         queryYoutube(videoDiv)
         
@@ -111,15 +97,22 @@ $(document).ready(function(){
 function querySeatGeek(){
     $('#results').empty();
     var url = 'https://api.seatgeek.com/2/events?taxonomies.name=' + eventType;
+    if(!displayFavorites){
+        url += '&' + $.param({
+            'per_page': 10,
+            'page': page,
+            'q': sgQ,
+            'client_id': sgId,
+            'client_secret': sgKey,
+            'performers.slug': sgPerformer
+         //   'lat': lat,
+          //  'lon': lon
+        });
+} else {
     url += '&' + $.param({
-    'per_page': 10,
-    'page': page,
-    'q': sgQ,
-    'client_id': sgId,
-    'client_secret': sgKey,
-    'performers.slug': sgPerformer,
-    'id': favorites
-    });
+        'id': favorites
+    })
+}
     console.log(url)
 
     $.ajax({
@@ -139,7 +132,7 @@ function querySeatGeek(){
             var resultPanel = $('<div class="panel panel-default resultPanel">')
             var panelHeading = $('<div class="panel-heading">').appendTo(resultPanel);
             // favorite button
-            var btnFavorite = $('<button class="btnFavorite">').appendTo(panelHeading)
+            var btnFavorite = $('<button class="btnFavorite">').appendTo(panelHeading);
             var panelTitle = $('<h1>').appendTo(panelHeading);
             
             var panelBody = $('<div class="panel-body">').appendTo(resultPanel);
@@ -245,7 +238,7 @@ function querySeatGeek(){
 
 // searches youtube for a video with the performer, output it to videoDiv
 function queryYoutube(videoDiv){
-    var googleUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q=' + qYoutube + '&type=video&videoEmbeddable=true&key=' + googleApiKey
+    var googleUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q=' + qYoutube + '&spart=snippet&type=video&videoCategoryId=10&videoEmbeddable=true&videoSyndicated=true&key=' + googleApiKey
     
     $.ajax({
         method: 'GET',
@@ -256,10 +249,11 @@ function queryYoutube(videoDiv){
     }).done(function(response){
         // get the results
         var results = response.items
+        console.log(results)
         // get the video id from the results for the url
         var videoId = results[0].id.videoId
         // set the embed url with the video id
-        var videoUrl  = 'https://www.youtube.com/embed/' + videoId
+        var videoUrl  = 'https://www.youtube.com/embed/' + videoId;
         // create the video panel to contain the video
         var videoPanel = $('<div class="panel panel-default">');
         var videoBody = $('<div class="panel-body">').appendTo(videoPanel)
@@ -284,31 +278,31 @@ function queryWeather(whenDiv, venueZip, dateTime){
         async: true,
       crossDomain: true,
       headers: {}
-      }).then(function(response) {
+    }).then(function(response) {
         var results = response.list
         console.log(response)
         for(var i = 0; i < results.length; i++){
 
-      var forecastStartTime = moment(results[i].dt_txt)
-      var forecastEndTime;
-      if(i + 1 < results.length){
-        forecastEndTime = moment(results[i + 1].dt_txt) 
-      } else {
-        forecastEndTime = moment(results[i].dt_txt)
-      }
+            var forecastStartTime = moment(results[i].dt_txt);
+            var forecastEndTime;
+            if(i + 1 < results.length){
+                forecastEndTime = moment(results[i + 1].dt_txt);
+            } else {
+                forecastEndTime = moment(results[i].dt_txt);
+            }
      
-      console.log(i, venueZip, forecastStartTime, forecastEndTime, dateTime)
-        if((moment(dateTime).isBetween(forecastStartTime, forecastEndTime, 'minute', [])) || (moment(dateTime).isSame(forecastStartTime, forecastEndTime, 'minute'))) {
-            var lowTemp = Math.round(results[i].main.temp_min)
-            var highTemp = Math.round(results[i].main.temp_max)
-            var humidity = results[i].main.humidity
-            var rain = results[i].rain
-            var forecast = results[i].weather[0].description
-            var weather = $("<div>").html('<h4>Forecast</h4>' + 'Temp: ' + lowTemp + ' - ' + highTemp + '&#176 (F)<br>' + forecast)
-            whenDiv.append(weather)
+            console.log(i, venueZip, forecastStartTime, forecastEndTime, dateTime)
+            if((moment(dateTime).isBetween(forecastStartTime, forecastEndTime, 'minute', [])) || (moment(dateTime).isSame(forecastStartTime, forecastEndTime, 'minute'))) {
+                var lowTemp = Math.round(results[i].main.temp_min)
+                var highTemp = Math.round(results[i].main.temp_max)
+                var humidity = results[i].main.humidity
+                var rain = results[i].rain
+                var forecast = results[i].weather[0].description
+                var weather = $("<div>").html('<h4>Forecast</h4>' + 'Temp: ' + lowTemp + ' - ' + highTemp + '&#176 (F)<br>' + forecast)
+                whenDiv.append(weather)
+            }
         }
-    }
-      });
+    });
 }
 
 
@@ -320,12 +314,9 @@ function updateFavoriteBtn(thisBtn){
    console.log(thisBtn.attr("event-id"))
     // if it's not in favorites[], empty star otherwise filled star
     if(favorites.indexOf(eventId) < 0){
-      //  $(thisBtn).attr("btnState", "inactive")
-        favStar.removeClass("glyphicon-star").addClass("glyphicon-star-empty")
-       
+        favStar.removeClass("glyphicon-star").addClass("glyphicon-star-empty");
     } else {
-     //   $(thisBtn).attr("btnState", "active")
-        favStar.removeClass("glyphicon-star-empty").addClass("glyphicon-star")  
+        favStar.removeClass("glyphicon-star-empty").addClass("glyphicon-star");
     }
         $(thisBtn).append(favStar)
 }

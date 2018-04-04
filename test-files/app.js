@@ -18,12 +18,12 @@ var favorites = [];
 var displayFavorites = false;
 var favoriteCount;
 var config = {
-    apiKey: "AIzaSyC7rTCfLMZJrv9vy53vXZhJenvje0qwRQU",
-    authDomain: "concert-cloud.firebaseapp.com",
-    databaseURL: "https://concert-cloud.firebaseio.com",
-    projectId: "concert-cloud",
-    storageBucket: "concert-cloud.appspot.com",
-    messagingSenderId: "36077992367"
+    apiKey: "AIzaSyC35dcKZI6Ud3VBCsYCRh0U9ITTqCnOTRo",
+    authDomain: "signin-test-c48e1.firebaseapp.com",
+    databaseURL: "https://signin-test-c48e1.firebaseio.com",
+    projectId: "signin-test-c48e1",
+    storageBucket: "signin-test-c48e1.appspot.com",
+    messagingSenderId: "792725143174"
   };
   firebase.initializeApp(config);
 var db = firebase.database()
@@ -34,6 +34,7 @@ var signinRefused = false;
 
 
 $(document).ready(function(){
+    
 /* EVENTBRITE
     $.ajax({
         method: 'GET',
@@ -368,9 +369,10 @@ function checkUser(){
     firebase.auth().onAuthStateChanged(function(user) {
         currentUser = user.uid;
        if(user){
+        
            signedIn = true;
          console.log(user.displayName + " is signed in as " + currentUser)
-         db.ref(currentUser).once("value", function(snapshot){
+         db.ref("/users/" + currentUser).once("value", function(snapshot){
        var snapshotval = snapshot.val();
          dbFavorites = snapshotval.favorites;
       //   favorites = combineArrays(localFavorites.concat(dbFavorites))
