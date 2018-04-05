@@ -17,7 +17,7 @@ var dbFavorites = [];
 var favorites = [];
 var displayFavorites = false;
 var favoriteCount;
-var config = {
+/*var config = {
     apiKey: "AIzaSyC35dcKZI6Ud3VBCsYCRh0U9ITTqCnOTRo",
     authDomain: "signin-test-c48e1.firebaseapp.com",
     databaseURL: "https://signin-test-c48e1.firebaseio.com",
@@ -25,9 +25,18 @@ var config = {
     storageBucket: "signin-test-c48e1.appspot.com",
     messagingSenderId: "792725143174"
   };
+  firebase.initializeApp(config); */
+  var config = {
+    apiKey: "AIzaSyC7rTCfLMZJrv9vy53vXZhJenvje0qwRQU",
+    authDomain: "concert-cloud.firebaseapp.com",
+    databaseURL: "https://concert-cloud.firebaseio.com",
+    projectId: "concert-cloud",
+    storageBucket: "concert-cloud.appspot.com",
+    messagingSenderId: "36077992367"
+  };
   firebase.initializeApp(config);
 var db = firebase.database()
-var ref = db.ref("/users/")
+//var ref = db.ref("/users/")
 var currentUser;
 var signedIn = false;
 var signinRefused = false;
@@ -35,22 +44,23 @@ var signinRefused = false;
 
 $(document).ready(function(){
     
-/* EVENTBRITE
-    $.ajax({
-        method: 'GET',
-        url: eventBriteurl,
-        async: true,
-        crossDomain: true,
-        headers: {}
-    }).done(function(response){
-        var results = response.events
-        console.log(results)
-        for(i=0; i < results.length; i++){
-            var title = results[i].name.html + '<p>'
-            $('#results').append(title)
-        }
-    }) */
+db.ref().on('value', function(snapshot){
+    console.log(snapshot.val())
+})
 
+db.ref('/users/testuser').set({name: "testUser",
+    favorites: favorites,
+    test: "testing"})
+
+firebase.auth().onAuthStateChanged(function(user) {
+   // currentUser = user.uid;
+   if(user){
+       signedIn = true;
+     console.log(user.displayName + " is signed in as " + currentUser)
+   }// else {
+    //   $('#myModal').modal();
+  // }
+})
     // click event for performer button - loads youtube video
     $('body').on('click', '.performerBtn', function(){
         // get the text of the button (performer name used for youtube search)
