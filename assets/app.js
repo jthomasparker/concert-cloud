@@ -133,19 +133,19 @@ $(document).ready(function(){
             geoip = userinput;
             city = "";
             state = "";
-            $("#locationMsg").text("Searching for events near " + userinput);
+            $("#locationMsg").html("Searching for events near " + userinput + ". <a style='color: white; cursor: pointer' onclick='clearLocation()'>Clear location</a>");
         }
         else if(validatedCity(userinput)){
             geoip = false;
             city = userinput.substring(5).trim();
             state = "";
-            $("#locationMsg").text("Searching for events near " + city);
+            $("#locationMsg").html("Searching for events near " + city + ". <a style='color: white; cursor: pointer' onclick='clearLocation()'>Clear location</a>");
         }
         else if(validatedState(userinput)){
             geoip = false;
             city = "";
             state = userinput.substring(6).trim();
-            $("#locationMsg").text("Searching for events in " + state);
+            $("#locationMsg").html("Searching for events in " + state + ". <a style='color: white; cursor: pointer' onclick='clearLocation()'>Clear location</a>");
         }
         else{
             sgQ = userinput;
@@ -208,7 +208,7 @@ $(document).ready(function(){
             lon = startPos.coords.longitude;
             console.log("startLat: " + lon + " startLon: " + lat);
              sgQ = $('#search').val();
-             $('#locationMsg').text("Searching for events near you");
+             $('#locationMsg').html("Searching for events near you. " + "<a style='color: white; cursor: pointer' onclick='clearLocation()'>Clear location</a>");
             querySeatGeek();
             $(this).blur();
         };
@@ -611,3 +611,12 @@ function validatedState(searchInput){
     return regExVal.test(searchInput);
 }
 
+function clearLocation() {
+    $('#locationMsg').html("");
+    geoip = false;
+    city = "";
+    state = "";
+    lon = 0;
+    lat = 0;
+    querySeatGeek();
+}
