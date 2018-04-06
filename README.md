@@ -1,44 +1,43 @@
-Team JAZ
-Georgia Tech Coding Bootcamp
-Fullstack Web Development
-Project 1
+Team JAZ<br>
+Georgia Tech Coding Bootcamp<br>
+Fullstack Web Development<br>
+Project 1<br>
 
-Our Team
-Josh Parker
-Alexandra Peralta
-Zarah Parker
+Our Team<br>
+Josh Parker<br>
+Alexandra Peralta<br>
+Zarah Parker<br>
 
-What is this?
-ConcertCloud is a one-stop solution to find concerts in your area, discover and sample new music, check the weather during the concert and plan your night out! 
-It can help you plan a vacation to a new place by showing you the local music scene there, it can also help you discover local artists at home.
-
-
-API’s, New Tech
-This project utilizes: 
-•	SeatGeek API to find upcoming concerts
-•	OpenWeatherMap API to check the weather during the date and time of the concert
-•	YouTube API to find music by the artists coming to town for you to preview
-•	jQuery for DOM manipulation
-•	Bootswatch for a pretty, streamlined alternative to Bootstrap
-•	Google Sign-in OAUTH to save your favorite concerts
-
-Who did what?
-Josh:
-- Google Sign-in OATH integration/favorites functionality
-- SeatGeek query
-- OpenWeatherMap query
-- YouTube query
+What is this?<br>
+ConcertCloud is a one-stop solution to find concerts in your area, discover and sample new music, check the weather during the concert and plan your night out! <br>
+It can help you plan a vacation to a new place by showing you the local music scene there, it can also help you discover local artists at home.<br>
 
 
-Alex:
-- Geolocation for SeatGeek results
-- Assisted with YouTube query
-- Add to Google calendar
-- Made it prettier
+API’s, New Tech<br>
+This project utilizes:<br> 
+•	SeatGeek API to find upcoming concerts<br>
+•	OpenWeatherMap API to check the weather during the date and time of the concert<br>
+•	YouTube API to find music by the artists coming to town for you to preview<br>
+•	jQuery for DOM manipulation<br>
+•	Bootswatch for a pretty, streamlined alternative to Bootstrap<br>
+•	Google Sign-in OAUTH to save your favorite concerts<br>
 
-Zarah:
--HTML5 framework
--Bootswatch integration
--Pagination for SeatGeek results
--Project management
+Who did what?<br>
+Josh:<br>
+- Google Sign-in OATH integration/favorites functionality<br>
+- SeatGeek query<br>
+- OpenWeatherMap query<br>
+- YouTube query<br>
+<br>
+Alex:<br>
+- Geolocation for SeatGeek results<br>
+- Assisted with YouTube query<br>
+- Add to Google calendar<br>
+<br>
+Zarah:<br>
+-HTML5 framework<br>
+-Bootswatch integration<br>
+-Pagination for SeatGeek results<br>
+-Project management<br>
+-Styling<br>
 
