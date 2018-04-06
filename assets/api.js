@@ -33,7 +33,7 @@ function getUrl(api){
                     // 'range': '200mi'
                     }                    
                 );
-                if(state != "" || typeof state != "undefined"){
+                if(state != "" ||  state != undefined){
                     url += '&' + $.param({
                         'venue.state' : state
                     }); 
