@@ -24,10 +24,10 @@ This project utilizes:<br>
 
 Who did what?<br>
 Josh:<br>
-- Google Sign-in OATH integration/favorites functionality<br>
-- SeatGeek query<br>
-- OpenWeatherMap query<br>
-- YouTube query<br>
+-Google Sign-in OATH integration/favorites functionality<br>
+-SeatGeek query<br>
+-OpenWeatherMap query<br>
+-YouTube query<br>
 <br>
 Alex:<br>
 - Geolocation for SeatGeek results<br>
