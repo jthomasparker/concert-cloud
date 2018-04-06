@@ -43,6 +43,39 @@ ref.on('value', function(snapshot){
     }
 })
 
+// on click function to load results for pagination
+
+$("#btn1").on("click",function() {
+    page = 1;
+    querySeatGeek();
+    toggleDisplay();
+    console.log(page);
+  });
+$("#btn2").on("click",function() {
+    page = 2;
+    querySeatGeek();
+    toggleDisplay();
+    console.log(page);
+  });
+  $("#btn3").on("click",function() {
+    page = 3;
+    querySeatGeek();
+    toggleDisplay();
+    console.log(page);
+  });
+  $("#btn4").on("click",function() {
+    page = 4;
+    querySeatGeek();
+    toggleDisplay();
+    console.log(page);
+  });
+  $("#btn5").on("click",function() {
+    page = 5;
+    querySeatGeek();
+    toggleDisplay();
+    console.log(page);
+  });
+
 
 
 //checkUser();
@@ -477,4 +510,5 @@ function toggleDisplay(){
             };
     };
 };
+
 
