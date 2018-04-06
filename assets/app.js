@@ -34,8 +34,10 @@ var signinRefused = false;
 var userPhoto;
 var geoip = false;;
 var city;
+var state;
 
 $(document).ready(function(){
+    $('#locationMsg').css("color", "white");
     toggleDisplay()
 signedIn = checkUserStatus()
 ref.on('value', function(snapshot){
@@ -116,7 +118,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     })
 
     $('#btnSearch').on('click', function () {
-        //  preventDefault();
+        //  preventDefault();        
         displayFavorites = false;        
         sgQ = "";
 
@@ -127,11 +129,21 @@ firebase.auth().onAuthStateChanged(function(user) {
          userinput = searchInput.val();
         if(validatedZipCode(userinput)){
             geoip = userinput;
+            city = "";
+            state = "";
             $("#locationMsg").text("Searching for events near " + userinput);
         }
         else if(validatedCity(userinput)){
+            geoip = false;
             city = userinput.substring(5).trim();
-            $("#locationMsg").text("Searching for events near " + userinput);
+            state = "";
+            $("#locationMsg").text("Searching for events near " + city);
+        }
+        else if(validatedState(userinput)){
+            geoip = false;
+            city = "";
+            state = userinput.substring(6).trim();
+            $("#locationMsg").text("Searching for events in " + state);
         }
         else{
             sgQ = userinput;
@@ -146,6 +158,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     })
 
     $('#navFavorites').on('click', function(){
+        $("#locationMsg").text("");
         displayFavorites = true;
         
         if((!signedIn)&&(!signinRefused)){
@@ -174,6 +187,8 @@ firebase.auth().onAuthStateChanged(function(user) {
         var startPos;
         var geoSuccess = function (position) {
             // Do magic with location
+            geoip = false;
+            city = "";
             startPos = position;
             lat = startPos.coords.latitude;
             lon = startPos.coords.longitude;
@@ -573,5 +588,8 @@ function validatedCity(searchInput){
     var regExVal = new RegExp('^city:');
     return regExVal.test(searchInput);
 }
-
+function validatedState(searchInput){
+    var regExVal = new RegExp('^state:');
+    return regExVal.test(searchInput);
+}
 

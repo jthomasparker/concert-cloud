@@ -29,9 +29,15 @@ function getUrl(api){
                     'lat': lat,
                     'lon': lon,
                     'geoip': geoip,
-                    'venue.city' : city
+                    'venue.city' : city                    
                     // 'range': '200mi'
-                    });
+                    }                    
+                );
+                if(state != ""){
+                    url += '&' + $.param({
+                        'venue.state' : state
+                    }); 
+                }
                 } else {
                     url += '&' + $.param({
                         'id': favorites,   
