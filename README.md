@@ -30,9 +30,11 @@ Josh:<br>
 -YouTube query<br>
 <br>
 Alex:<br>
-- Geolocation for SeatGeek results<br>
-- Assisted with YouTube query<br>
-- Add to Google calendar<br>
+-Geolocation for SeatGeek results<br>
+-Assisted with YouTube query<br>
+-Assisted with SeatGeek query<br>
+-Add to Google calendar<br>
+-Idea person<br>
 <br>
 Zarah:<br>
 -HTML5 framework<br>
