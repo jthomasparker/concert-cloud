@@ -38,68 +38,70 @@ var state;
 
 $(document).ready(function(){
     $('#locationMsg').css("color", "white");
+      // initial states  
+    $('.pagination').hide();
     toggleDisplay()
-signedIn = checkUserStatus()
-ref.on('value', function(snapshot){
-    if(signedIn){
-       // console.log(snapshot.val())
-    }
-})
+    signedIn = checkUserStatus()
 
-// on click function to load results for pagination
+    // firebase listener
+    ref.on('value', function(snapshot){
+        if(signedIn){
+        // console.log(snapshot.val())
+        }
+    })
 
-$("#btn1").on("click",function() {
-    page = 1;
-    querySeatGeek();
-    toggleDisplay();
-    console.log(page);
-  });
-$("#btn2").on("click",function() {
-    page = 2;
-    querySeatGeek();
-    toggleDisplay();
-    console.log(page);
-  });
-  $("#btn3").on("click",function() {
-    page = 3;
-    querySeatGeek();
-    toggleDisplay();
-    console.log(page);
-  });
-  $("#btn4").on("click",function() {
-    page = 4;
-    querySeatGeek();
-    toggleDisplay();
-    console.log(page);
-  });
-  $("#btn5").on("click",function() {
-    page = 5;
-    querySeatGeek();
-    toggleDisplay();
-    console.log(page);
-  });
+        // on click functions to load results for pagination
+    $("#btn1").on("click",function() {
+        page = 1;
+        querySeatGeek();
+        toggleDisplay();
+    });
+
+    $("#btn2").on("click",function() {
+        page = 2;
+        querySeatGeek();
+        toggleDisplay();
+    });
+
+    $("#btn3").on("click",function() {
+        page = 3;
+        querySeatGeek();
+        toggleDisplay();
+    });
+
+    $("#btn4").on("click",function() {
+        page = 4;
+        querySeatGeek();
+        toggleDisplay();
+    });
+
+    $("#btn5").on("click",function() {
+        page = 5;
+        querySeatGeek();
+        toggleDisplay();
+    });
 
 
-
-//checkUser();
-firebase.auth().onAuthStateChanged(function(user) {
-    
-   if(user){
+    // firebase listener to see when a user signs in or out
+    firebase.auth().onAuthStateChanged(function(user) {
+        // if user is signed in
+    if(user){
         signedIn = true;
         currentUid = user.uid;
         console.log(user.displayName + " is signed in as " + currentUid)
         updateUser();
         toggleDisplay();
-     
-   } else {
+     // if user is signed out
+    } else {
        signedIn = false;
        signinRefused = false;
        currentUid = null;
        resetVariables();
-       console.log(signedIn)
-   }
-   updateLoginBtn();
-})
+       console.log('Not signed in')
+        }
+    updateLoginBtn();
+    })
+
 
     // click event for performer button - loads youtube video
     $('body').on('click', '.performerBtn', function(){
@@ -114,7 +116,6 @@ firebase.auth().onAuthStateChanged(function(user) {
         // call youtube api with the div of where to display the video
         console.log(eventId)
         queryYoutube(videoDiv)
-        
     })
 
     $('#btnSearch').on('click', function () {
@@ -153,10 +154,35 @@ firebase.auth().onAuthStateChanged(function(user) {
 
     });
 
+    // click event for the search button
+    $('#btnSearch').on('click', function(){
+        // go to home screen, reset previous variables
+        displayFavorites = false;
+       // toggleDisplay();
+        resetVariables();
+        // get the search input
+        var  searchInput = $('#search')
+      // sgPerformer = searchInput.val();
+        sgQ = searchInput.val();
+        querySeatGeek();
+        toggleDisplay();
+        $('.pagination').show();
+        $(this).blur();
+    })
+
+    // resets search textbox
     $('#search').on('focus', function(){
         $(this).val('');
     })
+    // enter key for search
+    $('#search').keypress(function(e){
+        var key = e.which;
+        if(key === 13 && $('#search').val().length > 0){
+            $('#btnSearch').click()
+        }
+    })
 
+    // favorites nav button click event
     $('#navFavorites').on('click', function(){
         $("#locationMsg").text("");
         displayFavorites = true;
@@ -168,11 +194,13 @@ firebase.auth().onAuthStateChanged(function(user) {
         toggleDisplay();
     })
 
+    //  home nav button click event
     $('#navHome').on('click', function(){
         displayFavorites = false;
         toggleDisplay();
     })
 
+    // login button click event
     $('#btnLogin').on('click', function(){
         if(signedIn){
             firebase.auth().signOut();
@@ -218,6 +246,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     });
 
 
+    // favorite star click event that saves event to favorites
     $('body').on('click', '.btnFavorite', function(){
         var thisBtn = $(this)
         var eventId = $(this).attr("event-id")
@@ -225,12 +254,14 @@ firebase.auth().onAuthStateChanged(function(user) {
         if((!signedIn)&&(!signinRefused)){
             $('#loginModal').modal();
         }
+        // add or remove from favorites
         if(favorites.indexOf(eventId) < 0){
             favorites.push(eventId)
         } else {
             var idx = favorites.indexOf(eventId)
             favorites.splice(idx, 1)
         }
+        // updates the favorites page as favorites are added/removed
         if(displayFavorites){
             if(favorites.length > 0){
                 querySeatGeek();
@@ -238,7 +269,9 @@ firebase.auth().onAuthStateChanged(function(user) {
             $('#results').empty();
             }
         }
+        // update the favorite star button
         updateFavoriteBtn(thisBtn)
+        // update the db if user is signed in
         if(signedIn){
             ref.child(currentUid).update({favorites: favorites})
         }
@@ -246,12 +279,12 @@ firebase.auth().onAuthStateChanged(function(user) {
     })
 
 
-    
+    // cancel click event for the modal
     $('.cancelLogin').on('click', function(){
         signinRefused = true;
     })
  
-})
+}) // end of document.ready
 
 
 function resetVariables(){
@@ -260,16 +293,15 @@ function resetVariables(){
     var sgPerformer = "";
     var lon = 0;
     var lat = 0;
-
 }
 
 // searches seatgeek api
 function querySeatGeek(){
     $('#results').empty();
-
+    // get the api url
     var searchUrl = getUrl('sgEventSearch')
         console.log(searchUrl)
-    
+    // call the api
     callApi(searchUrl).done(function(response){
        
         // get the resulting events
@@ -287,15 +319,14 @@ function querySeatGeek(){
                                     'color': 'white',
                                     'border-color': 'black'
                                 })
-            // favorite button
+            // favorite (star) button
             var btnFavorite = $('<button class="btnFavorite">')
                             .appendTo(panelHeading)
                             .css({'background': 'black',
                                     'color': 'white',
                                     'border-color': 'black'
-                            });
+                                });
             var panelTitle = $('<h1>').appendTo(panelHeading);
-            
             var panelBody = $('<div class="panel-body">').appendTo(resultPanel);
 
             // create the sub row to divide main panel
@@ -340,7 +371,7 @@ function querySeatGeek(){
             var title = results[i].title;
             var date = moment(results[i].datetime_local).format("MM/DD/YYYY");
             var dateTime = moment(results[i].datetime_local);
-            
+            // format date and time
             var formattedDateTime = moment(results[i].datetime_local).format("dddd, MMMM Do YYYY, [at] h:mm a");
             var formattedAddress = venueStreet + "<br>" + venueCityandState + "<br>" + venueZip;
             
@@ -364,7 +395,7 @@ function querySeatGeek(){
             // append the videoDiv to the performersDiv (output video will display below performers)
             performersDiv.append(videoDiv);
             
-            // assign ids to divs for later use
+            // assign event-id attributes to divs for later use
             resultPanel.attr('event-id', eventId);
             performersDiv.attr('event-id', eventId);
             whenDiv.attr('event-id', eventId);
@@ -379,14 +410,8 @@ function querySeatGeek(){
             // get the weather if the event date is within the next 5 days (the openweather api limit)
             var fiveDaysAway = moment().add(5, 'd')
                 if(moment(dateTime).isBetween(moment(), fiveDaysAway)){
-                   /* var weatherUrl = getUrl('weather')
-                    callApi(weatherUrl).done(function(response){
-                        var results = response.list
-                        var forecast = getForecast(results, dateTime)
-                        whenDiv.html(forecast) */
-
+                    // get the weather with the venue zip code and date/time of event. whenDiv is where to put the weather
                     queryWeather(whenDiv, venueZip, dateTime);
-                   // });
                 }
 
             // append it all to the results div
@@ -465,7 +490,7 @@ function updateFavoriteBtn(thisBtn){
 
     // if it's not in favorites[], empty star otherwise filled star
     if(favorites.indexOf(eventId) < 0){
-        favStar.removeClass("glyphicon-star").addClass("glyphicon-star-empty") //.css('text-color','white');
+        favStar.removeClass("glyphicon-star").addClass("glyphicon-star-empty")
     } else {
         favStar.removeClass("glyphicon-star-empty").addClass("glyphicon-star text-danger");
     };
@@ -516,9 +541,6 @@ function updateUser(){
 };
 
 
-
-
-
 // combines 2 arrays and removes duplicates
 function combineArrays(array){
     var arr = array.concat();
@@ -536,15 +558,14 @@ function combineArrays(array){
 }
 
 
-
 // updates the "login/out" button based on user status
 function updateLoginBtn(){
     if(signedIn){
-        
+        if(firebase.auth().currentUser.providerData[0].providerId === 'google.com'){
         var userPhoto = firebase.auth().currentUser.photoURL;
-        $('#btnLogin').html("Sign Out")
         $('#profilePic').html('<img src="' + userPhoto +'" class="img-circle img-responsive" width="40" height="auto">')
-
+        }
+        $('#btnLogin').html("Sign Out")
     } else {
         $('#btnLogin').html("Sign In")
     }
@@ -554,6 +575,17 @@ function updateLoginBtn(){
 
 // toggles the page between displaying favorites or home
 function toggleDisplay(){
+    // update pagination buttons
+    var pageList = $('.pagination').children();
+    for(i = 0; i < pageList.length; i++){
+        var pageBtn = $('#btn' + i)
+        if(pageBtn.attr('id') === 'btn' + page){
+            pageBtn.addClass('active disabled')
+        } else {
+            pageBtn.removeClass('active disabled')
+        }
+    }
+
     if(displayFavorites){
         $('#navFavorites').addClass("active");
         $('#navHome').removeClass("active");
