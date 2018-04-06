@@ -39,7 +39,7 @@ $(document).ready(function(){
 signedIn = checkUserStatus()
 ref.on('value', function(snapshot){
     if(signedIn){
-        console.log(snapshot.val())
+       // console.log(snapshot.val())
     }
 })
 
@@ -213,14 +213,13 @@ firebase.auth().onAuthStateChanged(function(user) {
         if(signedIn){
             ref.child(currentUid).update({favorites: favorites})
         }
+        $(this).blur();
     })
 
+
+    
     $('.cancelLogin').on('click', function(){
         signinRefused = true;
-    })
-
-    $('body').on('click', function(){
-        $(this).blur();
     })
  
 })
@@ -252,10 +251,20 @@ function querySeatGeek(){
         for(i = 0; i < results.length; i++){
             
             // create the main panel for results
-            var resultPanel = $('<div class="panel panel-default resultPanel">')
-            var panelHeading = $('<div class="panel-heading">').appendTo(resultPanel);
+            var resultPanel = $('<div class="panel panel-default resultPanel">').css('border-color', 'black')
+            var panelHeading = $('<div class="panel-heading">')
+                                .appendTo(resultPanel)
+                                .css({'background': 'black',
+                                    'color': 'white',
+                                    'border-color': 'black'
+                                })
             // favorite button
-            var btnFavorite = $('<button class="btnFavorite">').appendTo(panelHeading);
+            var btnFavorite = $('<button class="btnFavorite">')
+                            .appendTo(panelHeading)
+                            .css({'background': 'black',
+                                    'color': 'white',
+                                    'border-color': 'black'
+                            });
             var panelTitle = $('<h1>').appendTo(panelHeading);
             
             var panelBody = $('<div class="panel-body">').appendTo(resultPanel);
@@ -427,9 +436,9 @@ function updateFavoriteBtn(thisBtn){
 
     // if it's not in favorites[], empty star otherwise filled star
     if(favorites.indexOf(eventId) < 0){
-        favStar.removeClass("glyphicon-star").addClass("glyphicon-star-empty");
+        favStar.removeClass("glyphicon-star").addClass("glyphicon-star-empty") //.css('text-color','white');
     } else {
-        favStar.removeClass("glyphicon-star-empty").addClass("glyphicon-star");
+        favStar.removeClass("glyphicon-star-empty").addClass("glyphicon-star text-danger");
     };
 
     // add the updated star to the button
