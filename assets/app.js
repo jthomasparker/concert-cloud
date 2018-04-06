@@ -171,6 +171,37 @@ $(document).ready(function(){
         
         updateLoginBtn();
     })
+    $(".locationBtn").on("click", function (event) {
+        event.preventDefault(); //prevent page from loading on button click
+        var startPos;
+        var geoSuccess = function (position) {
+            // Do magic with location
+            startPos = position;
+            lat = startPos.coords.latitude;
+            lon = startPos.coords.longitude;
+            console.log("startLat: " + lon + " startLon: " + lat);
+            // sgQ = $('#search').val();
+            querySeatGeek();
+        };
+        var geoError = function (error) {
+            switch (error.code) {
+                case error.TIMEOUT:
+                    // The user didn't accept the callout
+                    lat = "";
+                    lon = "";
+                    if (google.loader.ClientLocation) {
+
+                        var lati = google.loader.ClientLocation.latitude;
+                        var longi = google.loader.ClientLocation.longitude;
+                        console.log(lati + " + " + longi);
+                    }
+                    showNudgeBanner();
+                    break;
+            }
+        };
+        navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
+    });
+
 
     // favorite star click event that saves event to favorites
     $('body').on('click', '.btnFavorite', function(){
