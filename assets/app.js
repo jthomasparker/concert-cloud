@@ -117,13 +117,14 @@ $(document).ready(function(){
         console.log(eventId)
         queryYoutube(videoDiv)
     })
-
+    // click event for the search button
     $('#btnSearch').on('click', function () {
-        //  preventDefault();        
+        //  preventDefault();    
+        // go to home screen, reset previous variables    
         displayFavorites = false;        
         sgQ = "";
 
-        toggleDisplay();
+        //toggleDisplay();
         resetVariables();
 
         var searchInput = $('#search');
@@ -150,25 +151,10 @@ $(document).ready(function(){
             sgQ = userinput;
         }
         querySeatGeek();
+        $('.pagination').show();
         $(this).blur();
 
     });
-
-    // click event for the search button
-    $('#btnSearch').on('click', function(){
-        // go to home screen, reset previous variables
-        displayFavorites = false;
-       // toggleDisplay();
-        resetVariables();
-        // get the search input
-        var  searchInput = $('#search')
-      // sgPerformer = searchInput.val();
-        sgQ = searchInput.val();
-        querySeatGeek();
-        toggleDisplay();
-        $('.pagination').show();
-        $(this).blur();
-    })
 
     // resets search textbox
     $('#search').on('focus', function(){
