@@ -32,7 +32,8 @@ var currentUid = null;
 var signedIn = false;
 var signinRefused = false;
 var userPhoto;
-
+var geoip = false;;
+var city;
 
 $(document).ready(function(){
     toggleDisplay()
@@ -114,20 +115,31 @@ firebase.auth().onAuthStateChanged(function(user) {
         
     })
 
-    $('#btnSearch').on('click', function(){
-      //  preventDefault();
-        displayFavorites = false;
-        
+    $('#btnSearch').on('click', function () {
+        //  preventDefault();
+        displayFavorites = false;        
+        sgQ = "";
+
         toggleDisplay();
         resetVariables();
 
-        var  searchInput = $('#search');
-      // sgPerformer = searchInput.val();
-            sgQ = searchInput.val();
-            querySeatGeek();
+        var searchInput = $('#search');
+         userinput = searchInput.val();
+        if(validatedZipCode(userinput)){
+            geoip = userinput;
+            $("#locationMsg").text("Searching for events near " + userinput);
+        }
+        else if(validatedCity(userinput)){
+            city = userinput.substring(5).trim();
+            $("#locationMsg").text("Searching for events near " + userinput);
+        }
+        else{
+            sgQ = userinput;
+        }
+        querySeatGeek();
         $(this).blur();
-     
-    })
+
+    });
 
     $('#search').on('focus', function(){
         $(this).val('');
@@ -166,8 +178,10 @@ firebase.auth().onAuthStateChanged(function(user) {
             lat = startPos.coords.latitude;
             lon = startPos.coords.longitude;
             console.log("startLat: " + lon + " startLon: " + lat);
-            // sgQ = $('#search').val();
+             sgQ = $('#search').val();
+             $('#locationMsg').text("Searching for events near you");
             querySeatGeek();
+            $(this).blur();
         };
         var geoError = function (error) {
             switch (error.code) {
@@ -550,5 +564,14 @@ function toggleDisplay(){
             };
     };
 };
+
+function validatedZipCode(searchInput){
+    var regExVal = new RegExp('^\\d{5}([\\-]?\\d{4})?$');
+    return regExVal.test(searchInput);
+}
+function validatedCity(searchInput){
+    var regExVal = new RegExp('^city:');
+    return regExVal.test(searchInput);
+}
 
 

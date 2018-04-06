@@ -28,7 +28,8 @@ function getUrl(api){
                     'performers.slug': sgPerformer,
                     'lat': lat,
                     'lon': lon,
-                    // 'geoip': true,
+                    'geoip': geoip,
+                    'venue.city' : city
                     // 'range': '200mi'
                     });
                 } else {
