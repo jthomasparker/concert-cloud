@@ -348,8 +348,8 @@ function querySeatGeek(){
                                     'border-color': 'black'
                                 });
             var panelTitle = $('<h1>').appendTo(panelHeading);
-            // panelTitle.css({'display': 'inline-block',
-            //                 'margin': '0.37em 0'});
+            panelTitle.css({'display': 'inline-block',
+                            'margin': '0.37em 0'});
             // create a div to wrap the panel body to make it collapsible, append it to the panel
             var collapseDiv = $('<div class="panel-collapse collapse in">')
             .attr('id', "collapse-" + eventId)
@@ -377,7 +377,6 @@ function querySeatGeek(){
             // venuePanel contains venue info
             var venuePanel = $('<div class="panel panel-default">').appendTo(leftCol);
             var venueBody = $('<div class="panel-body">')
-                            .html("<h3>Where:</h3>")
                             .appendTo(venuePanel);
             var venueDiv = $('<div>').appendTo(venueBody);
             // event panel is for event info like performers
@@ -388,6 +387,7 @@ function querySeatGeek(){
             var performersDiv = $('<div>')
                                 .html("<h3>Who:</h3>")
                                 .appendTo(eventDiv);
+            var whereDiv = $('<div>').html("<h3>Where:</h3>");                    
             // div for event date and forecast
             var whenDiv = $('<div>').html("<h3>When:</h3>");
             // div for youtube video display
@@ -405,18 +405,29 @@ function querySeatGeek(){
                                         .attr("event-id", eventId)
                                         .appendTo(performersDiv);    
                 };
-
+             // append url to ticketsDiv
+             ticketsDiv.html("<a target='_blank' href = '"+ eventUrl + "'>Get Tickets </a>");
             // Set the title of the result panel
             panelTitle.html(date + " - " + title);
+            //where div
+            whereDiv.append(venueName, formattedAddress)
+                .css({
+                    'float' : 'left',
+                    'max-width' : '262px'
+                });
             // append the formatted date/time to whenDiv
-            whenDiv.append(formattedDateTime);
-            // append url to ticketsDiv
-            ticketsDiv.html("<a href = '"+ eventUrl + "'>Get Tickets </a>");
+            whenDiv.append(formattedDateTime,ticketsDiv)
+            .css({
+                'float' : 'right',
+                'margin-right' : '12px'
+            });;
+           
             //TODO: get venue rating from yelp?
             // append all the venue stuff plus the whenDiv to the venue panel
-            venueDiv.append(venueName, formattedAddress, whenDiv, ticketsDiv);
+            venueDiv.append(whereDiv, whenDiv);
             // append the videoDiv to the performersDiv (output video will display below performers)
-            performersDiv.append(videoDiv);
+            performersDiv.append(videoDiv)
+            .css('overflow', 'hidden');
             
             // assign event-id attributes to divs for later use
             resultPanel.attr('event-id', eventId);
@@ -459,12 +470,11 @@ function queryYoutube(videoDiv){
         var videoUrl  = 'https://www.youtube.com/embed/' + videoId;
         // create the video panel to contain the video
         var videoPanel = $('<div class="panel panel-default">');
-        var videoBody = $('<div class="panel-body">').appendTo(videoPanel);
         var iframeDiv = $('<div class="embed-responsive embed-responsive-16by9">');
         var videoEmbed = $('<iframe class="embed-responsive-item" allowfullscreen>')
                             .attr({src: videoUrl})
                             .appendTo(iframeDiv);
-        videoBody.html(iframeDiv);
+        videoPanel.html(iframeDiv);
         videoDiv.html(videoPanel); 
     });
 };
@@ -510,6 +520,7 @@ function updateFavoriteBtn(thisBtn){
     thisBtn.empty();
     var eventId = $(thisBtn).attr("event-id");
     var favStar = $('<span class="glyphicon">');
+    favStar.css('top','-17px');
 
     // if it's not in favorites[], empty star otherwise filled star
     if(favorites.indexOf(eventId) < 0){
