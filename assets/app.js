@@ -37,7 +37,15 @@ var city;
 var state;
 
 $(document).ready(function(){
-    $('#locationMsg').css("color", "white");
+    $('#locationMsg').css("color", "white");   
+    //style opaque panels?
+    var color = "#f5f5f5";
+    var rgbaCol = 'rgba(' + parseInt(color.slice(-6,-4),16)
+        + ',' + parseInt(color.slice(-4,-2),16)
+        + ',' + parseInt(color.slice(-2),16)
+        +',0.5)';
+    $('.jumbotron').css("background-color", "rgbaCol");
+     
       // initial states  
     $('.pagination').hide();
     toggleDisplay()
@@ -349,7 +357,9 @@ function querySeatGeek(){
                                 });
             var panelTitle = $('<h1>').appendTo(panelHeading);
             panelTitle.css({'display': 'inline-block',
-                            'margin': '0.37em 0'});
+                            'margin': '0.37em 0',
+                            'max-width' : '1078px',
+                            'word-wrap' : 'break-word'});
             // create a div to wrap the panel body to make it collapsible, append it to the panel
             var collapseDiv = $('<div class="panel-collapse collapse in">')
             .attr('id', "collapse-" + eventId)
@@ -436,7 +446,9 @@ function querySeatGeek(){
             whenDiv.attr('event-id', eventId);
             videoDiv.attr('event-id', eventId);
             btnFavorite.attr({'id': 'b' + eventId,
-                            'event-id': eventId})
+                            'event-id': eventId});           
+            
+
                            
             // update the star based on whether or not it has been favorited
             updateFavoriteBtn(btnFavorite)
