@@ -356,12 +356,13 @@ function querySeatGeek(){
             .appendTo(resultPanel)
             // change glyph based on whether or not the panel is collapsed
             .on('shown.bs.collapse', function() {
-                glyph.addClass('glyphicon-chevron-up');
-                glyph.removeClass('glyphicon-chevron-down')
+                // glyph.addClass('glyphicon-chevron-up');
+                // glyph.removeClass('glyphicon-chevron-down')
             })
             .on('hidden.bs.collapse', function() {
-                glyph.addClass('glyphicon-chevron-down')
-                glyph.removeClass('glyphicon-chevron-up')})
+                // glyph.addClass('glyphicon-chevron-down')
+                // glyph.removeClass('glyphicon-chevron-up')
+            })
                 
                 
             var panelBody = $('<div class="panel-body">').appendTo(collapseDiv);
