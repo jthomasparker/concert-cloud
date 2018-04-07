@@ -133,17 +133,23 @@ $(document).ready(function(){
             geoip = userinput;
             city = "";
             state = "";
+            lat  = 0;
+            lon = 0;
             $("#locationMsg").html("Searching for events near " + userinput + ". <a style='color: white; cursor: pointer' onclick='clearLocation()'>Clear location</a>");
         }
         else if(validatedCity(userinput)){
             geoip = false;
             city = userinput.substring(5).trim();
             state = "";
+            lat  = 0;
+            lon = 0;
             $("#locationMsg").html("Searching for events near " + city + ". <a style='color: white; cursor: pointer' onclick='clearLocation()'>Clear location</a>");
         }
         else if(validatedState(userinput)){
             geoip = false;
             city = "";
+            lat  = 0;
+            lon = 0;
             state = userinput.substring(6).trim();
             $("#locationMsg").html("Searching for events in " + state + ". <a style='color: white; cursor: pointer' onclick='clearLocation()'>Clear location</a>");
         }
@@ -296,6 +302,25 @@ function querySeatGeek(){
 
         // loop through the results
         for(i = 0; i < results.length; i++){
+            // assign the event results to variables
+            var eventId = results[i].id;
+            var eventUrl = results[i].url;
+            var eventScore = results[i].score;
+            var urlEncodedVenueName = encodeURI(results[i].venue.name);
+            var venueName = '<a target="_blank" href= "https://www.google.com/maps/search/?api=1&query=' + urlEncodedVenueName + '">' + '<h4>' + results[i].venue.name + '</h4>' + '</a>';
+            var venueStreet = results[i].venue.address;
+            var venueCity = results[i].venue.city;
+            var venueState = results[i].venue.state;
+            var venueCityandState = venueCity + ", " + venueState;
+            var venueZip = results[i].venue.postal_code;
+            var venueLocation = results[i].venue.location;
+            var title = results[i].title;
+            var date = moment(results[i].datetime_local).format("MM/DD/YYYY");
+            var dateTime = moment(results[i].datetime_local);
+            // format date and time
+            var formattedDateTime = moment(results[i].datetime_local).format("dddd, MMMM Do YYYY, [at] h:mm a");
+            var formattedAddress = venueStreet + "<br>" + venueCityandState + "<br>" + venueZip;
+            
             
             // create the main panel for results
             var resultPanel = $('<div class="panel panel-default resultPanel">').css('border-color', 'black')
@@ -305,6 +330,16 @@ function querySeatGeek(){
                                     'color': 'white',
                                     'border-color': 'black'
                                 })
+                                .attr({
+                                    'data-toggle': "collapse",
+                                    'href': "#collapse-" + eventId
+                                });
+            // glyph to show collapsed/not collapsed
+            var glyphSpan = $('<span>')
+            .html("<p>")
+            .appendTo(panelHeading);
+            var glyph = $('<i class="glyphicon">') //changed to no glyph since the toggle on collapse wasn't changing the icon
+            .appendTo(glyphSpan);
             // favorite (star) button
             var btnFavorite = $('<button class="btnFavorite">')
                             .appendTo(panelHeading)
@@ -313,7 +348,23 @@ function querySeatGeek(){
                                     'border-color': 'black'
                                 });
             var panelTitle = $('<h1>').appendTo(panelHeading);
-            var panelBody = $('<div class="panel-body">').appendTo(resultPanel);
+            // panelTitle.css({'display': 'inline-block',
+            //                 'margin': '0.37em 0'});
+            // create a div to wrap the panel body to make it collapsible, append it to the panel
+            var collapseDiv = $('<div class="panel-collapse collapse in">')
+            .attr('id', "collapse-" + eventId)
+            .appendTo(resultPanel)
+            // change glyph based on whether or not the panel is collapsed
+            .on('shown.bs.collapse', function() {
+                glyph.addClass('glyphicon-chevron-up');
+                glyph.removeClass('glyphicon-chevron-down')
+            })
+            .on('hidden.bs.collapse', function() {
+                glyph.addClass('glyphicon-chevron-down')
+                glyph.removeClass('glyphicon-chevron-up')})
+                
+                
+            var panelBody = $('<div class="panel-body">').appendTo(collapseDiv);
 
             // create the sub row to divide main panel
             var row = $('<div class="row">').appendTo(panelBody);
@@ -340,26 +391,10 @@ function querySeatGeek(){
             // div for event date and forecast
             var whenDiv = $('<div>').html("<h3>When:</h3>");
             // div for youtube video display
-            var videoDiv = $('<div class="video-output">');
-            
+            var videoDiv = $('<div class="video-output">');  
+            //div for eventurl, tickets
+            var ticketsDiv = $('<div class="tickets">');          
                             
-            // assign the event results to variables
-            var eventId = results[i].id;
-            var eventUrl = results[i].url;
-            var eventScore = results[i].score;
-            var venueName = '<h4>' + results[i].venue.name + '</h4>';
-            var venueStreet = results[i].venue.address;
-            var venueCity = results[i].venue.city;
-            var venueState = results[i].venue.state;
-            var venueCityandState = venueCity + ", " + venueState;
-            var venueZip = results[i].venue.postal_code;
-            var venueLocation = results[i].venue.location;
-            var title = results[i].title;
-            var date = moment(results[i].datetime_local).format("MM/DD/YYYY");
-            var dateTime = moment(results[i].datetime_local);
-            // format date and time
-            var formattedDateTime = moment(results[i].datetime_local).format("dddd, MMMM Do YYYY, [at] h:mm a");
-            var formattedAddress = venueStreet + "<br>" + venueCityandState + "<br>" + venueZip;
             
             // get the performers
                 for(j = 0; j < results[i].performers.length; j++){
@@ -375,9 +410,11 @@ function querySeatGeek(){
             panelTitle.html(date + " - " + title);
             // append the formatted date/time to whenDiv
             whenDiv.append(formattedDateTime);
+            // append url to ticketsDiv
+            ticketsDiv.html("<a href = '"+ eventUrl + "'>Get Tickets </a>");
             //TODO: get venue rating from yelp?
             // append all the venue stuff plus the whenDiv to the venue panel
-            venueDiv.append(venueName, formattedAddress, whenDiv);
+            venueDiv.append(venueName, formattedAddress, whenDiv, ticketsDiv);
             // append the videoDiv to the performersDiv (output video will display below performers)
             performersDiv.append(videoDiv);
             
@@ -554,6 +591,7 @@ function updateLoginBtn(){
         $('#btnLogin').html("Sign Out")
     } else {
         $('#btnLogin').html("Sign In")
+        $('#profilePic').empty();
     }
 }
 
