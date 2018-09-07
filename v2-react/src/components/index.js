@@ -1,3 +1,4 @@
 import CustomNavbar from './CustomNavbar'
+import EventCard from './EventCard'
 
-export default CustomNavbar
+export { CustomNavbar, EventCard }

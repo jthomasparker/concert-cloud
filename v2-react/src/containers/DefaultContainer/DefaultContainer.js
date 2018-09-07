@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
-import CustomNavbar from '../../components'
-import { TabContent, TabPane, InputGroup, InputGroupAddon, InputGroupText, Input, Button, Container, Row, Col } from 'reactstrap'
-import API from '../../utils/API'
+import { CustomNavbar } from '../../components'
+import { TabContent, TabPane } from 'reactstrap'
+import { Home, Favorites } from '../../views'
 class DefaultContainer extends Component {
     constructor(props) {
         super(props)
         this.toggleTab = this.toggleTab.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this)
-        this.handleSearch = this.handleSearch.bind(this)
         this.state = {
             activeTab: 'home',
             searchVal: '',
@@ -23,25 +21,6 @@ class DefaultContainer extends Component {
         })
     }
 
-    handleInputChange = event => {
-        const { name, value } = event.target;
-        this.setState({
-          [name]: value
-        });
-      }
-
-    handleSearch = () => {
-        API.getEvents({
-            searchVal: this.state.searchVal,
-            pageNum: this.state.pageNum,
-            geoip: this.state.geoip
-        })
-        .then(result => console.log(result.data.events))
-        .catch(err => console.log(err))
-    }
-
-    
-
 
     render() {
         return (
@@ -52,28 +31,10 @@ class DefaultContainer extends Component {
                     />
                 <TabContent activeTab={this.state.activeTab}>
                     <TabPane tabId="home">
-                    <Container>
-                        <Row>
-                            <Col xs="3"/>
-                            <Col xs="6">    
-                        <InputGroup size="lg">
-                            <Input
-                                name="searchVal"
-                                placeholder="Search" 
-                                value={this.state.searchVal}
-                                onChange={this.handleInputChange} />
-                            
-                                <InputGroupAddon addonType="append">
-                                <Button color="secondary" onClick={this.handleSearch}><i className="fa fa-search fa-lg" /></Button>
-                                </InputGroupAddon>
-                        </InputGroup>
-                        </Col>
-                        <Col xs="3"/>
-                        </Row>
-                        </Container> 
+                        <Home/>
                     </TabPane>
                     <TabPane tabId="favorites">
-                        Favorites Tab
+                        <Favorites />
                     </TabPane>
                 </TabContent>
             </div>

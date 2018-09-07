@@ -1,3 +1,3 @@
 import CustomNavbar from './CustomNavbar'
 
-export default CustomNavbar;
+export default CustomNavbar
