@@ -6,18 +6,25 @@ class DefaultContainer extends Component {
     constructor(props) {
         super(props)
         this.toggleTab = this.toggleTab.bind(this);
+        this.updateFavorites = this.updateFavorites.bind(this)
         this.state = {
             activeTab: 'home',
-            searchVal: '',
-            pageNum: 1,
-            geoip: false
+            favorites: []
         };
     }
 
 
-    toggleTab = tab => {
+    toggleTab(tab) {
         this.setState({
             activeTab: tab
+        })
+    }
+
+    updateFavorites(id) {
+        let newFavorites = this.state.favorites
+        newFavorites = newFavorites.includes(id) ? newFavorites.filter(fav => fav != id) : [id, ...newFavorites]
+        this.setState({
+            favorites: newFavorites
         })
     }
 
@@ -31,10 +38,16 @@ class DefaultContainer extends Component {
                     />
                 <TabContent activeTab={this.state.activeTab}>
                     <TabPane tabId="home">
-                        <Home/>
+                        <Home
+                            favorites={this.state.favorites}
+                            updateFavorites={this.updateFavorites}
+                            />
                     </TabPane>
                     <TabPane tabId="favorites">
-                        <Favorites />
+                        <Favorites 
+                            favorites={this.state.favorites}
+                            updateFavorites={this.updateFavorites}
+                            />
                     </TabPane>
                 </TabContent>
             </div>

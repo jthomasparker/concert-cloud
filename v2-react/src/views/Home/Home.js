@@ -9,19 +9,27 @@ class Home extends Component {
         super(props)
         this.handleInputChange = this.handleInputChange.bind(this)
         this.handleSearch = this.handleSearch.bind(this)
+        this.clearInput = this.clearInput.bind(this)
         this.state = {
             searchVal: '',
             pageNum: 1,
-            geoip: false
+            geoip: false,
+            results: []
         };
     }
 
-    handleInputChange = event => {
-        const { name, value } = event.target;
+    handleInputChange = e => {
+        const { name, value } = e.target;
         this.setState({
           [name]: value
         });
       }
+
+    clearInput = () => {
+        this.setState({
+            searchVal: ''
+        })
+    }
 
     handleSearch = () => {
         API.getEvents({
@@ -29,7 +37,12 @@ class Home extends Component {
             pageNum: this.state.pageNum,
             geoip: this.state.geoip
         })
-        .then(result => console.log(result.data.events))
+        .then(res => {
+            console.log(res.data.events)
+            this.setState({
+                results: res.data.events
+            })
+        })
         .catch(err => console.log(err))
     }
 
@@ -38,8 +51,8 @@ class Home extends Component {
 
     render() {
         return (
-                <Container>
-                    <Row>
+                <Container className="p-1">
+                    <Row className="mb-4">
                         <Col xs="3"/>
                         <Col xs="6">    
                             <InputGroup size="lg">
@@ -47,7 +60,8 @@ class Home extends Component {
                                     name="searchVal"
                                     placeholder="Search" 
                                     value={this.state.searchVal}
-                                    onChange={this.handleInputChange} 
+                                    onChange={this.handleInputChange}
+                                    onFocus={this.clearInput} 
                                 />
                                 <InputGroupAddon addonType="append">
                                     <Button 
@@ -60,7 +74,16 @@ class Home extends Component {
                         </Col>
                         <Col xs="3"/>
                     </Row>
-                    <EventCard title={"this is the title"} />
+                    {this.state.results.map(event => (
+                        <EventCard
+                            key={event.id}
+                            toggleFavs={this.props.updateFavorites}
+                            isFavorite={this.props.favorites.includes(event.id)}
+                            event={event}
+                            />
+                        ))
+                    }
+                    
                 </Container> 
         )
     }

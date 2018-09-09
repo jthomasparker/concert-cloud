@@ -13,7 +13,15 @@ export default {
                                     per_page: 10,
                                     geoip: data.geoip
                                 }
+                            }),
+    
+    getWeather: zipCode => axios.get('https://api.openweathermap.org/data/2.5/forecast?', {
+                                params: 
+                                {
+                                    APPID: keys.apiKeys.weather_api,
+                                    units: 'imperial',
+                                    zip: zipCode 
+                                }
                             })
-                        
 
 }
