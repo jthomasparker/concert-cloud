@@ -53,8 +53,8 @@ class Home extends Component {
         return (
                 <Container className="p-1">
                     <Row className="mb-4">
-                        <Col xs="3"/>
-                        <Col xs="6">    
+                        <Col md="3"/>
+                        <Col md="6">    
                             <InputGroup size="lg">
                                 <Input
                                     name="searchVal"
@@ -72,7 +72,7 @@ class Home extends Component {
                                 </InputGroupAddon>
                             </InputGroup>
                         </Col>
-                        <Col xs="3"/>
+                        <Col md="3"/>
                     </Row>
                     {this.state.results.map(event => (
                         <EventCard

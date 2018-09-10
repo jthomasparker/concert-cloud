@@ -22,6 +22,20 @@ export default {
                                     units: 'imperial',
                                     zip: zipCode 
                                 }
+                            }),
+
+    getArtistVideo: artist => axios.get('https://www.googleapis.com/youtube/v3/search?', {
+                                params:
+                                {
+                                    key: keys.apiKeys.youtube_api,
+                                    maxResults: 1,
+                                    q: artist + ' official',
+                                    part: 'snippet',
+                                    type: 'video',
+                                    videoCategoryId: 10,
+                                    videoEmbeddable: true,
+                                    videoSyndicated: true,
+                                }
                             })
 
 }

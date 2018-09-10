@@ -22,7 +22,8 @@ class DefaultContainer extends Component {
 
     updateFavorites(id) {
         let newFavorites = this.state.favorites
-        newFavorites = newFavorites.includes(id) ? newFavorites.filter(fav => fav != id) : [id, ...newFavorites]
+        newFavorites = newFavorites.includes(id) ? newFavorites.filter(fav => fav != id) 
+                                                    : [id, ...newFavorites]
         this.setState({
             favorites: newFavorites
         })
